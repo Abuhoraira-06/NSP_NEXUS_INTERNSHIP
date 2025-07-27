@@ -1,0 +1,118 @@
+import streamlit as st
+import sys
+import os
+
+# Add backend path for custom modules
+sys.path.append(os.path.join(os.getcwd(), "Backend"))
+from Chatbot import ChatBot
+
+# ---- Page Config ----
+st.set_page_config(page_title="RAPTOR AI", layout="centered")
+
+# ---- Custom CSS Styling ----
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+    html, body, [class*="css"] {
+        background-color: #000000;
+        font-family: 'Orbitron', sans-serif;
+        color: #f0f0f0;
+    }
+
+    .neon-black {
+        font-size: 3.5em;
+        text-align: center;
+        color: black;
+        text-shadow:
+            0 0 5px #ffffff,
+            0 0 10px #cccccc,
+            0 0 15px #999999;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        letter-spacing: 4px;
+    }
+
+    .chat-container {
+        width: 85%;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .chat-bubble {
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 1rem;
+        max-width: 75%;
+        word-wrap: break-word;
+    }
+
+    .user {
+        align-self: flex-end;
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+
+    .bot {
+        align-self: flex-start;
+        background-color: #141414;
+        color: #aafaff;
+    }
+
+    .stButton > button {
+        background-color: #00ffff;
+        color: #000;
+        padding: 0.5rem 1.2rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .stButton > button:hover {
+        background-color: #00cccc;
+    }
+
+    .stTextInput > div > input {
+        background-color: #111;
+        color: white;
+        border-radius: 6px;
+        border: 1px solid #00cccc;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+
+    </style>
+""", unsafe_allow_html=True)
+
+# ---- Glowing "RAPTOR.AI" Title ----
+st.markdown('<div class="neon-black">RAPTOR AI</div>', unsafe_allow_html=True)
+
+# ---- Chat History State ----
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+# ---- Input Area ----
+query = st.text_input("💬 Type your message:", "")
+
+# ---- Send Button Only ----
+if st.button("Send"):
+    if query.strip():
+        answer = ChatBot(query)
+        st.session_state.chat_history.append(("You", query))
+        st.session_state.chat_history.append(("RAPTOR AI", answer))
+        st.experimental_rerun()
+
+# ---- Chat Display ----
+st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+for sender, msg in st.session_state.chat_history:
+    role_class = "user" if sender == "You" else "bot"
+    st.markdown(
+        f'<div class="chat-bubble {role_class}"><strong>{sender}:</strong><br>{msg}</div>',
+        unsafe_allow_html=True
+    )
+st.markdown('</div>', unsafe_allow_html=True)
